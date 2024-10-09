@@ -118,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const HomeScreen()),
+                                    builder: (context) => HomeScreen()),
                               );
                             },
                             style: ElevatedButton.styleFrom(

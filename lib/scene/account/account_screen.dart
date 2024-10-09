@@ -104,9 +104,7 @@ class AccountScreenState extends State<AccountScreen>
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  return const SizedBox(
-                    child: Text('No data'),
-                  );
+                  return const SizedBox();
                 }
               },
             ),

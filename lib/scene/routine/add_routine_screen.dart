@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:realm/realm.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steady_routine/components/day_of_week_filter.dart';
 import 'package:steady_routine/components/column_divider.dart';
 import 'package:steady_routine/components/categories_select.dart';
@@ -9,7 +11,6 @@ import 'package:steady_routine/components/time_picker.dart';
 import 'package:steady_routine/util/size_config.dart';
 import 'package:steady_routine/model/routine.dart';
 import 'package:steady_routine/service/realm_service.dart';
-import 'package:realm/realm.dart';
 
 class AddRotineScreen extends StatefulWidget {
   const AddRotineScreen({super.key});
@@ -343,7 +344,13 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                         RealmService.realmInstance.realm.add(routine);
                       });
 
-                      Navigator.pop(context, true);
+                      Future.microtask(() async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool("firstAddRoutine", true);
+                        if (context.mounted) {
+                          Navigator.pop(context, true);
+                        }
+                      });
                     }
                   },
                   style: ElevatedButton.styleFrom(

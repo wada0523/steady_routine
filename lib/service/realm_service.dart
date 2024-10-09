@@ -50,4 +50,12 @@ class RealmService {
       realm.add(target, update: true);
     });
   }
+
+  void deleteRoutine(ObjectId eventId) async {
+    final personToDelete =
+        realm.query<RoutineModel>(r'id == $0', [eventId]).first;
+    realm.write(() {
+      realm.delete(personToDelete);
+    });
+  }
 }

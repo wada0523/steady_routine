@@ -1,63 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:steady_routine/navigation_service.dart';
 import 'package:steady_routine/scene/onboarding/onboarding_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steady_routine/service/realm_service.dart';
+import 'package:steady_routine/providers/locale_provider.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    // ProviderScopeを配置
     const ProviderScope(
       child: MyApp(),
     ),
   );
 }
 
-final localeProvider =
-    StateProvider<Locale>((ref) => AppLocalizations.supportedLocales.first);
-
-class MyApp extends StatefulWidget {
-  static void setLocale(BuildContext context, Locale newLocale) {
-    _MyAppState state = context.findAncestorStateOfType<_MyAppState>()!;
-    state.setLocale(newLocale);
-  }
-
+class MyApp extends HookConsumerWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
 
-class _MyAppState extends State<MyApp> {
-  Locale? locale;
+    useEffect(
+      () {
+        () async {
+          RealmService.realmInstance.initialize();
+        }();
+        return null;
+      },
+      [],
+    );
 
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedLanguage();
-
-    RealmService.realmInstance.initialize();
-  }
-
-  void setLocale(Locale newLocale) {
-    setState(() {
-      locale = newLocale;
-    });
-  }
-
-  void _loadSavedLanguage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String savedLanguageCode = prefs.getString('languageCode') ?? "ja";
-    setState(() {
-      locale = Locale(savedLanguageCode);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: NavigationService.navigatorKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -66,6 +40,20 @@ class _MyAppState extends State<MyApp> {
         Locale('en'),
       ],
       locale: locale,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (locale == null) {
+          return supportedLocales.first;
+        }
+        for (final supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale.languageCode) {
+            return supportedLocale;
+          }
+        }
+        return supportedLocales.first;
+      },
       home: const OnboardingScreen(),
     );
   }

@@ -1,36 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:steady_routine/main.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:steady_routine/providers/locale_provider.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
-
   @override
-  SettingsScreenState createState() => SettingsScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
 
-class SettingsScreenState extends State<SettingsScreen> {
-  int _selectLocale = -1;
-
-  @override
-  void initState() {
-    Future(() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      setState(() {
-        var text = prefs.getString('languageCode') ?? "ja";
-        if (text == "ja") {
-          _selectLocale = 0;
-        } else {
-          _selectLocale = 1;
-        }
-      });
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -73,17 +52,18 @@ class SettingsScreenState extends State<SettingsScreen> {
                   label: Text(
                     "日本語",
                     style: TextStyle(
-                      color: _selectLocale == 0 ? Colors.white : Colors.black,
+                      color: locale.languageCode == "ja"
+                          ? Colors.white
+                          : Colors.black,
                     ),
                   ),
-                  selected: _selectLocale == 0,
+                  selected: locale.languageCode == "ja",
                   selectedColor: const Color(0xfff88273),
                   backgroundColor: const Color(0xffececec),
                   onSelected: (_) {
-                    setState(() {
-                      _selectLocale = 0;
-                      _changeLanguage(context, "ja");
-                    });
+                    ref
+                        .read(localeNotifierProvider.notifier)
+                        .setLocale(const Locale("ja"));
                   },
                 ),
                 ChoiceChip(
@@ -91,17 +71,18 @@ class SettingsScreenState extends State<SettingsScreen> {
                   label: Text(
                     "English",
                     style: TextStyle(
-                      color: _selectLocale == 1 ? Colors.white : Colors.black,
+                      color: locale.languageCode == "en"
+                          ? Colors.white
+                          : Colors.black,
                     ),
                   ),
-                  selected: _selectLocale == 1,
+                  selected: locale.languageCode == "en",
                   selectedColor: const Color(0xfff88273),
                   backgroundColor: const Color(0xffececec),
                   onSelected: (_) {
-                    setState(() {
-                      _selectLocale = 1;
-                      _changeLanguage(context, "en");
-                    });
+                    ref
+                        .read(localeNotifierProvider.notifier)
+                        .setLocale(const Locale("en"));
                   },
                 ),
               ],
@@ -110,13 +91,5 @@ class SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
-  }
-
-  void _changeLanguage(BuildContext context, String languageCode) async {
-    Locale newLocale = Locale(languageCode);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('languageCode', languageCode);
-    if (!context.mounted) return;
-    MyApp.setLocale(context, newLocale);
   }
 }
