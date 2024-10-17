@@ -31,7 +31,35 @@ class RealmService {
     );
   }
 
-  void updateRoutine(ObjectId eventId, DateTime date, bool completeFlg) {
+  Future<int> getAllCount() async {
+    return await Future.delayed(
+      const Duration(milliseconds: 100),
+      () => realm.all<RoutineModel>().length,
+    );
+  }
+
+  void updateRoutine(RoutineModel routine) {
+    realm.write(() {
+      var target = realm
+          .all<RoutineModel>()
+          .query(r'id == $0', [routine.id])
+          .toList()
+          .first;
+
+      // Update the fields of the existing routine
+      target.routineName = routine.routineName; // Update name
+      target.category = routine.category; // Update category
+      target.maxCount = routine.maxCount; // Update max count
+      target.startDate = routine.startDate; // Update start date
+      target.endDate = routine.endDate; // Update end date
+      target.date = routine.date; // Update date
+      target.time = routine.time; // Update time
+      target.weekDays = routine.weekDays; // Update weekdays
+      target.memo = routine.memo; // Update memo
+    });
+  }
+
+  void updateCompleteFlg(ObjectId eventId, DateTime date, bool completeFlg) {
     realm.write(() {
       var target = realm
           .all<RoutineModel>()

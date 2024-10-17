@@ -11,47 +11,60 @@ class CategoriesSelect extends StatefulWidget {
 class CategoriesSelectState extends State<CategoriesSelect> {
   CategoryType? selectedType;
 
+  void _updateState(int index) {
+    setState(() {
+      selectedType = index.toCategoryType();
+    });
+  }
+
+  void setCategoryType(int index) {
+    _updateState(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: CategoryType.values.length,
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 100.0,
-          ),
-          itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedType = index.toCategoryType();
-                });
-              },
-              child: Card(
-                  color: selectedType == index.toCategoryType()
-                      ? const Color(0xfff88273)
-                      : Colors.white,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          CategoryType.values[index].toImagePath(),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          CategoryType.values[index].name,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: CategoryType.values.length,
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 100.0,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          final categoryType =
+              CategoryType.values[index]; // Get the category type
+
+          return GestureDetector(
+            onTap: () {
+              _updateState(index);
+            },
+            child: Card(
+              color: selectedType == categoryType
+                  ? const Color(0xfff88273) // Change color if selected
+                  : Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      categoryType.toImagePath(), // Use the category type
                     ),
-                  )),
-            );
-          }),
+                    const SizedBox(height: 10),
+                    Text(
+                      categoryType.name, // Use the category type
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

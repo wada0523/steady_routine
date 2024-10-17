@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:realm/realm.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steady_routine/components/day_of_week_filter.dart';
 import 'package:steady_routine/components/column_divider.dart';
 import 'package:steady_routine/components/categories_select.dart';
@@ -13,7 +12,9 @@ import 'package:steady_routine/model/routine.dart';
 import 'package:steady_routine/service/realm_service.dart';
 
 class AddRotineScreen extends StatefulWidget {
-  const AddRotineScreen({super.key});
+  final RoutineModel? routine;
+
+  const AddRotineScreen({super.key, this.routine});
 
   @override
   AddRotineScreenState createState() => AddRotineScreenState();
@@ -22,6 +23,7 @@ class AddRotineScreen extends StatefulWidget {
 class AddRotineScreenState extends State<AddRotineScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  bool _isEdit = false;
   int _selectType = 0;
   int _selectNeedsTime = 0;
 
@@ -33,6 +35,57 @@ class AddRotineScreenState extends State<AddRotineScreen> {
   final _keyTimePickerState = GlobalKey<CustomTimePickerState>();
   final _keyCategoriesSelectState = GlobalKey<CategoriesSelectState>();
   final TextEditingController _memoController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.routine != null) {
+      _isEdit = true;
+      _routineController.text = widget.routine!.routineName;
+      _selectType = widget.routine!.date != null ? 1 : 0;
+      _selectNeedsTime = widget.routine!.time != null ? 0 : 1;
+
+      _keyDayOfWeekFilterState.currentState?.filtersNum
+          .addAll(widget.routine!.weekDays);
+
+      _keyDayOfWeekFilterState.currentState?.filters.addAll(
+        widget.routine!.weekDays.map((day) => getDayString(day)).toList(),
+      );
+
+      var a = widget.routine!.category;
+      var b = a.toCategory();
+      var c = b.toIndex();
+      _keyCategoriesSelectState.currentState?.setCategoryType(c);
+
+      _keyTimePickerState.currentState?.setTime(widget.routine!.time);
+      _keyDatePickerState.currentState?.setDate(widget.routine!.date);
+      _keyStartDatePickerState.currentState?.setDate(widget.routine!.startDate);
+      _keyEndDatePickerState.currentState?.setDate(widget.routine!.endDate);
+      _memoController.text = widget.routine!.memo ?? "";
+    }
+  }
+
+  String getDayString(int day) {
+    switch (day) {
+      case 1:
+        return AppLocalizations.of(context)!.monday;
+      case 2:
+        return AppLocalizations.of(context)!.tuesday;
+      case 3:
+        return AppLocalizations.of(context)!.wednesday;
+      case 4:
+        return AppLocalizations.of(context)!.thursday;
+      case 5:
+        return AppLocalizations.of(context)!.friday;
+      case 6:
+        return AppLocalizations.of(context)!.saturday;
+      case 7:
+        return AppLocalizations.of(context)!.sunday;
+      default:
+        return "";
+    }
+  }
 
   @override
   void dispose() {
@@ -340,17 +393,16 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                           weekDays: weekdays,
                           memo: _memoController.text);
 
-                      RealmService.realmInstance.realm.write(() {
-                        RealmService.realmInstance.realm.add(routine);
-                      });
-
-                      Future.microtask(() async {
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool("firstAddRoutine", true);
-                        if (context.mounted) {
-                          Navigator.pop(context, true);
-                        }
-                      });
+                      if (_isEdit) {
+                        RealmService.realmInstance.updateRoutine(routine);
+                      } else {
+                        RealmService.realmInstance.realm.write(() {
+                          RealmService.realmInstance.realm.add(routine);
+                        });
+                      }
+                      if (context.mounted) {
+                        Navigator.pop(context, true);
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(

@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steady_routine/scene/account/account_screen.dart';
 import 'package:steady_routine/model/category_type.dart';
@@ -21,16 +22,20 @@ class HomeScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final hasRoutine = useState<bool>(false);
     final selectedIndex = useState<int>(0);
     final selectedDate = useState<DateTime>(DateTime.now());
-    final checkStates = useState<List<bool>>([]);
+    final checkStates = useState<Map<String, Map<ObjectId, bool>>>({});
 
     useEffect(() {
-      Future.microtask(() async {
-        await _fetchRoutine(DateTime.now());
-      });
+      _checkHasRoutine(hasRoutine);
       return null;
     }, []);
+
+    useEffect(() {
+      _fetchRoutine(selectedDate.value, checkStates);
+      return null;
+    }, [selectedDate.value]);
 
     return Scaffold(
       appBar: AppBar(),
@@ -39,7 +44,6 @@ class HomeScreen extends HookConsumerWidget {
           initialDate: selectedDate.value,
           onDateChange: (date) {
             selectedDate.value = date;
-            _fetchRoutine(selectedDate.value);
           },
           activeColor: const Color(0xffFFBF9B),
           dayProps: const EasyDayProps(
@@ -67,20 +71,14 @@ class HomeScreen extends HookConsumerWidget {
             stream: _eventController.stream,
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
-                // 初期のチェックボックス状態を設定
-                if (checkStates.value.isEmpty) {
-                  checkStates.value = List.generate(
-                    snapshot.data!.length,
-                    (index) => snapshot.data![index].completeDays.contains(
-                      DateFormat('yyyyMMdd').format(selectedDate.value),
-                    ),
-                  );
-                }
-
                 return ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     final routine = snapshot.data![index];
+                    bool isComplete =
+                        checkStates.value[selectedDate.value.toString()]
+                                ?[routine.id] ??
+                            false;
 
                     return Stack(
                       clipBehavior: Clip.none,
@@ -102,16 +100,28 @@ class HomeScreen extends HookConsumerWidget {
                                 Checkbox(
                                   activeColor:
                                       const Color.fromRGBO(33, 150, 243, 1),
-                                  value: checkStates.value[index],
+                                  value: isComplete,
                                   onChanged: (value) {
-                                    checkStates.value[index] = value ?? false;
-                                    RealmService.realmInstance.updateRoutine(
+                                    bool completeFlg = value ?? false;
+
+                                    // Update checkStates for the selected date
+                                    checkStates.value = {
+                                      ...checkStates.value,
+                                      selectedDate.value.toString(): {
+                                        ...checkStates.value[selectedDate.value
+                                                .toString()] ??
+                                            {},
+                                        routine.id: completeFlg,
+                                      }
+                                    };
+
+                                    // Save the updated state to Realm
+                                    RealmService.realmInstance
+                                        .updateCompleteFlg(
                                       routine.id,
                                       selectedDate.value,
-                                      checkStates.value[index],
+                                      completeFlg,
                                     );
-                                    checkStates
-                                        .notifyListeners(); // 状態が変わったことを通知
                                   },
                                 ),
                                 Text(routine.routineName),
@@ -128,7 +138,8 @@ class HomeScreen extends HookConsumerWidget {
                                                     routine: routine)),
                                       ).then((value) {
                                         if (value) {
-                                          _fetchRoutine(selectedDate.value);
+                                          _fetchRoutine(
+                                              selectedDate.value, checkStates);
                                         }
                                       });
                                     },
@@ -159,33 +170,7 @@ class HomeScreen extends HookConsumerWidget {
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else {
-                return FutureBuilder<SharedPreferences>(
-                  future: SharedPreferences.getInstance(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<SharedPreferences> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Text("");
-                    } else if (snapshot.hasError) {
-                      return const Text("");
-                    } else {
-                      final prefs = snapshot.data;
-                      final bool firstAddRoutine =
-                          prefs?.getBool("firstAddRoutine") ?? false;
-                      if (firstAddRoutine) {
-                        return const Text("");
-                      } else {
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: Image.asset(
-                                AppLocalizations.of(context)!.no_data_img_path),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                );
+                return _noDataWidget(context, hasRoutine);
               }
             },
           ),
@@ -231,7 +216,9 @@ class HomeScreen extends HookConsumerWidget {
                     builder: (context) => const AddRotineScreen()),
               ).then((value) {
                 if (value) {
-                  _fetchRoutine(selectedDate.value);
+                  if (!hasRoutine.value) {
+                    _checkHasRoutine(hasRoutine);
+                  }
                 }
               });
               break;
@@ -249,9 +236,58 @@ class HomeScreen extends HookConsumerWidget {
     );
   }
 
-  Future<void> _fetchRoutine(DateTime date) async {
+  Widget _noDataWidget(BuildContext context, ValueNotifier<bool> hasRoutine) {
+    return FutureBuilder<SharedPreferences>(
+      future: SharedPreferences.getInstance(),
+      builder:
+          (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
+        if (snapshot.hasError || hasRoutine.value) {
+          return const Text("");
+        } else {
+          final prefs = snapshot.data;
+          final bool firstAddRoutine =
+              prefs?.getBool("firstAddRoutine") ?? false;
+          if (firstAddRoutine) {
+            return const Text("");
+          } else {
+            return SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child:
+                    Image.asset(AppLocalizations.of(context)!.no_data_img_path),
+              ),
+            );
+          }
+        }
+      },
+    );
+  }
+
+  void _checkHasRoutine(ValueNotifier<bool> hasRoutine) async {
+    int count = await RealmService.realmInstance.getAllCount();
+    hasRoutine.value = (count != 0);
+  }
+
+  Future<void> _fetchRoutine(DateTime date,
+      ValueNotifier<Map<String, Map<ObjectId, bool>>> checkStates) async {
     List<RoutineModel> todayRoutine =
         await RealmService.realmInstance.getRoutines(date);
+
+    Map<ObjectId, bool> newStates = checkStates.value[date.toString()] ?? {};
+
+    for (RoutineModel routine in todayRoutine) {
+      bool isComplete = routine.completeDays.contains(
+        DateFormat('yyyyMMdd').format(date),
+      );
+      newStates[routine.id] = isComplete;
+    }
+
+    checkStates.value = {
+      ...checkStates.value,
+      date.toString(): newStates,
+    };
+
     _eventController.add(todayRoutine);
   }
 }

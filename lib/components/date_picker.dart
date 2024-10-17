@@ -26,6 +26,12 @@ class CustomDatePickerState extends State<CustomDatePicker> {
     });
   }
 
+  void setDate(DateTime? newDate) {
+    if (newDate != null) {
+      _updateDate(newDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(

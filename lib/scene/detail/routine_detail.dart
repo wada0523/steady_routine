@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:steady_routine/components/column_divider.dart';
 import 'package:steady_routine/model/routine.dart';
 import 'package:steady_routine/scene/modal/routine_detail_daialog.dart';
+import 'package:steady_routine/scene/routine/add_routine_screen.dart';
+import 'package:steady_routine/util/size_config.dart';
 
 class RoutineDetailScreen extends HookConsumerWidget {
   final RoutineModel routine;
 
-  const RoutineDetailScreen({required this.routine});
+  const RoutineDetailScreen({super.key, required this.routine});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    SizeConfig().init(context);
+    double width = SizeConfig.screenW!;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -52,28 +58,28 @@ class RoutineDetailScreen extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(AppLocalizations.of(context)!.repeat,
-                    style: const TextStyle(fontSize: 18)),
+                    style: const TextStyle(fontSize: 13)),
                 Text(_formatWeekDays(routine.weekDays),
-                    style: const TextStyle(fontSize: 18)),
+                    style: const TextStyle(fontSize: 13)),
               ],
             ),
-            const Divider(),
+            const ColumnDivider(),
             _buildDateRow(AppLocalizations.of(context)!.when_will_you_start,
                 routine.startDate),
-            const Divider(),
+            const ColumnDivider(),
             _buildDateRow(
                 AppLocalizations.of(context)!.until_when_will_you_try_it,
                 routine.endDate),
-            const Divider(),
+            const ColumnDivider(),
             _buildTimeRow(
                 AppLocalizations.of(context)!.specify_time, routine.time),
-            const Divider(),
+            const ColumnDivider(),
             _buildCategoryRow(routine.category),
-            const Divider(),
+            const ColumnDivider(),
             Text(AppLocalizations.of(context)!.memo,
-                style: const TextStyle(fontSize: 18)),
+                style: const TextStyle(fontSize: 13)),
             Padding(
-              padding: const EdgeInsets.only(top: 8.0),
+              padding: const EdgeInsets.only(top: 12.0, bottom: 24.0),
               child: Text(
                 routine.memo ?? '',
                 style: const TextStyle(fontSize: 16),
@@ -82,16 +88,36 @@ class RoutineDetailScreen extends HookConsumerWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle edit button press
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            AddRotineScreen(routine: routine)),
+                  ).then((value) {
+                    if (value) {}
+                  });
                 },
-                child: Text(AppLocalizations.of(context)!.edit),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xff585858),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  padding: (width <= 550)
+                      ? const EdgeInsets.symmetric(
+                          horizontal: 100, vertical: 20)
+                      : EdgeInsets.symmetric(
+                          horizontal: width * 0.2, vertical: 25),
+                  textStyle: TextStyle(fontSize: (width <= 550) ? 13 : 17),
                 ),
+                child: Text(AppLocalizations.of(context)!.edit),
               ),
             ),
+            const Padding(
+              padding: EdgeInsets.only(top: 12.0),
+            ),
             Center(
-              child: TextButton(
+              child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -103,16 +129,22 @@ class RoutineDetailScreen extends HookConsumerWidget {
                         return RoutineDeleteDialog(routine: routine);
                       },
                     ),
-                  ).then((value) {
-                    if (value && context.mounted) {
-                      Navigator.pop(context, true);
-                    }
-                  });
+                  );
                 },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: const Color(0xff585858),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  padding: (width <= 550)
+                      ? const EdgeInsets.symmetric(
+                          horizontal: 100, vertical: 20)
+                      : EdgeInsets.symmetric(
+                          horizontal: width * 0.2, vertical: 25),
+                  textStyle: TextStyle(fontSize: (width <= 550) ? 13 : 17),
+                ),
                 child: Text(AppLocalizations.of(context)!.delete),
-                style: TextButton.styleFrom(
-                    // primary: Colors.grey,
-                    ),
               ),
             ),
           ],
@@ -125,9 +157,9 @@ class RoutineDetailScreen extends HookConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 18)),
+        Text(label, style: const TextStyle(fontSize: 13)),
         Text(date != null ? DateFormat('yyyy / M / d').format(date) : '未指定',
-            style: const TextStyle(fontSize: 18)),
+            style: const TextStyle(fontSize: 13)),
       ],
     );
   }
@@ -136,9 +168,9 @@ class RoutineDetailScreen extends HookConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 18)),
+        Text(label, style: const TextStyle(fontSize: 13)),
         Text(time != null ? DateFormat('HH:mm').format(time) : '未指定',
-            style: const TextStyle(fontSize: 18)),
+            style: const TextStyle(fontSize: 13)),
       ],
     );
   }
@@ -147,12 +179,12 @@ class RoutineDetailScreen extends HookConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('カテゴリ', style: TextStyle(fontSize: 18)),
+        const Text('カテゴリ', style: TextStyle(fontSize: 13)),
         Row(
           children: [
             const Icon(Icons.circle, color: Colors.teal, size: 24),
             const SizedBox(width: 8),
-            Text(category, style: const TextStyle(fontSize: 18)),
+            Text(category, style: const TextStyle(fontSize: 13)),
           ],
         ),
       ],

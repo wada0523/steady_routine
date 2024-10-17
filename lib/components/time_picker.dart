@@ -28,6 +28,12 @@ class CustomTimePickerState extends State<CustomTimePicker> {
     });
   }
 
+  void setTime(DateTime? newTime) {
+    if (newTime != null) {
+      _updateTime(newTime);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(

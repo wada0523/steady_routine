@@ -15,28 +15,28 @@ extension ParseToString on CategoryType {
 
     switch (this) {
       case CategoryType.diet:
-        str = "diet";
+        str = "Diet";
         break;
       case CategoryType.beauty:
-        str = "beauty";
+        str = "Beauty";
         break;
       case CategoryType.child:
-        str = "child";
+        str = "Child";
         break;
       case CategoryType.study:
-        str = "study";
+        str = "Study";
         break;
       case CategoryType.medicine:
-        str = "medicine";
+        str = "Medicine";
         break;
       case CategoryType.book:
-        str = "book";
+        str = "Book";
         break;
       case CategoryType.food:
-        str = "food";
+        str = "Food";
         break;
       case CategoryType.other:
-        str = "other";
+        str = "Other";
         break;
     }
     return str;
@@ -48,28 +48,28 @@ extension ParseToCategory on String {
     CategoryType type = CategoryType.other;
 
     switch (this) {
-      case "diet":
+      case "Diet":
         type = CategoryType.diet;
         break;
-      case "beauty":
+      case "Beauty":
         type = CategoryType.beauty;
         break;
-      case "child":
+      case "Child":
         type = CategoryType.child;
         break;
-      case "study":
+      case "Study":
         type = CategoryType.study;
         break;
-      case "medicine":
+      case "Medicine":
         type = CategoryType.medicine;
         break;
-      case "book":
+      case "Book":
         type = CategoryType.book;
         break;
-      case "food":
+      case "Food":
         type = CategoryType.food;
         break;
-      case "other":
+      case "Other":
         type = CategoryType.other;
         break;
     }
@@ -79,7 +79,7 @@ extension ParseToCategory on String {
 
 extension ParseImagePath on CategoryType {
   String toImagePath() {
-    return "assets/images/category_${toShortString()}.png";
+    return "assets/images/category_${toShortString().toLowerCase()}.png";
   }
 }
 
