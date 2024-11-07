@@ -14,13 +14,14 @@ class RealmService {
 
   Future<List<RoutineModel>> getRoutines(DateTime date) async {
     DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
-    DateTime end = DateTime(date.year, date.month, date.day, 23, 59);
+    DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
+    int weekday = date.weekday;
 
     return await Future.delayed(
       const Duration(milliseconds: 100),
       () => realm.all<RoutineModel>().query(
-          r'date >= $0 && date <= $1 OR (startDate <= $0 AND endDate >= $0 AND ANY weekDays == $2)',
-          [start, end, date.weekday]).toList(),
+          r'(date >= $0 AND date <= $1) OR (startDate <= $0 AND endDate >= $0 AND ANY weekDays == $2)',
+          [start, end, weekday]).toList(),
     );
   }
 
@@ -40,22 +41,28 @@ class RealmService {
 
   void updateRoutine(RoutineModel routine) {
     realm.write(() {
-      var target = realm
-          .all<RoutineModel>()
-          .query(r'id == $0', [routine.id])
-          .toList()
-          .first;
+      // リストが空でないかを確認
+      var results =
+          realm.all<RoutineModel>().query(r'id == $0', [routine.id]).toList();
 
-      // Update the fields of the existing routine
-      target.routineName = routine.routineName; // Update name
-      target.category = routine.category; // Update category
-      target.maxCount = routine.maxCount; // Update max count
-      target.startDate = routine.startDate; // Update start date
-      target.endDate = routine.endDate; // Update end date
-      target.date = routine.date; // Update date
-      target.time = routine.time; // Update time
-      target.weekDays = routine.weekDays; // Update weekdays
-      target.memo = routine.memo; // Update memo
+      if (results.isNotEmpty) {
+        var target = results.first;
+        routine.weekDays.sort();
+        target.routineName = routine.routineName;
+        target.category = routine.category;
+        target.maxCount = routine.maxCount;
+        target.startDate = routine.startDate;
+        target.endDate = routine.endDate;
+        target.date = routine.date;
+        target.time = routine.time;
+        target.memo = routine.memo;
+
+        target.weekDays.clear();
+        target.weekDays.addAll(routine.weekDays);
+      } else {
+        // IDに該当するRoutineが見つからない場合の処理
+        print("Routine with ID ${routine.id} not found.");
+      }
     });
   }
 

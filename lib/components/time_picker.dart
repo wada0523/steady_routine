@@ -5,19 +5,22 @@ import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as picker;
 
 class CustomTimePicker extends StatefulWidget {
+  final DateTime? initialTime;
+
   @override
   State<CustomTimePicker> createState() => CustomTimePickerState();
 
-  const CustomTimePicker({super.key});
+  const CustomTimePicker({super.key, this.initialTime});
 }
 
 class CustomTimePickerState extends State<CustomTimePicker> {
-  DateTime time = DateTime.now();
+  late DateTime time;
   String _timeString = "";
 
   @override
   void initState() {
     super.initState();
+    time = widget.initialTime?.toLocal() ?? DateTime.now().toLocal();
     _timeString = DateFormat('HH : mm').format(time);
   }
 

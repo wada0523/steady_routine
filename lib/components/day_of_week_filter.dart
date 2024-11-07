@@ -2,15 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DayOfWeekFilter extends StatefulWidget {
+  final List<int>? initialFiltersNum;
+
   @override
   State<DayOfWeekFilter> createState() => DayOfWeekFilterState();
 
-  const DayOfWeekFilter({super.key});
+  const DayOfWeekFilter({super.key, this.initialFiltersNum});
 }
 
 class DayOfWeekFilterState extends State<DayOfWeekFilter> {
-  final List<int> filtersNum = <int>[];
-  final List<String> filters = <String>[];
+  List<int> filtersNum = <int>[];
+  List<String> filters = <String>[];
+
+  @override
+  void initState() {
+    super.initState();
+    filtersNum = widget.initialFiltersNum ?? <int>[];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    filters.addAll(
+      filtersNum.map((day) => getDayString(day)).toList(),
+    );
+  }
 
   Iterable<Widget> dayOfWeekWidgets(BuildContext context) sync* {
     List<String> weekdays = [
@@ -42,7 +58,7 @@ class DayOfWeekFilterState extends State<DayOfWeekFilter> {
         selected: filters.contains(weekday),
         onSelected: (value) {
           setState(() {
-            if (value) {
+            if (value == true) {
               filters.add(weekday);
               filtersNum.add(index + 1); // DateTimeクラスのweekdayは1（=月曜日）
             } else {
@@ -70,5 +86,26 @@ class DayOfWeekFilterState extends State<DayOfWeekFilter> {
         ),
       ),
     );
+  }
+
+  String getDayString(int day) {
+    switch (day) {
+      case 1:
+        return AppLocalizations.of(context)!.monday;
+      case 2:
+        return AppLocalizations.of(context)!.tuesday;
+      case 3:
+        return AppLocalizations.of(context)!.wednesday;
+      case 4:
+        return AppLocalizations.of(context)!.thursday;
+      case 5:
+        return AppLocalizations.of(context)!.friday;
+      case 6:
+        return AppLocalizations.of(context)!.saturday;
+      case 7:
+        return AppLocalizations.of(context)!.sunday;
+      default:
+        return "";
+    }
   }
 }

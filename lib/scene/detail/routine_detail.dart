@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:steady_routine/components/column_divider.dart';
+import 'package:steady_routine/model/category_type.dart';
 import 'package:steady_routine/model/routine.dart';
 import 'package:steady_routine/scene/modal/routine_detail_daialog.dart';
 import 'package:steady_routine/scene/routine/add_routine_screen.dart';
@@ -46,43 +47,83 @@ class RoutineDetailScreen extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Text(
-                routine.routineName, // Routine name
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Container(
+              padding: const EdgeInsets.all(5.0),
+              width: width,
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xffECECEC)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  routine.routineName, // Routine name
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(AppLocalizations.of(context)!.repeat,
-                    style: const TextStyle(fontSize: 13)),
-                Text(_formatWeekDays(routine.weekDays),
-                    style: const TextStyle(fontSize: 13)),
-              ],
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(AppLocalizations.of(context)!.repeat,
+                      style: const TextStyle(fontSize: 14)),
+                  Text(_formatWeekDays(routine.weekDays),
+                      style: const TextStyle(fontSize: 14)),
+                ],
+              ),
             ),
             const ColumnDivider(),
-            _buildDateRow(AppLocalizations.of(context)!.when_will_you_start,
-                routine.startDate),
-            const ColumnDivider(),
-            _buildDateRow(
-                AppLocalizations.of(context)!.until_when_will_you_try_it,
-                routine.endDate),
-            const ColumnDivider(),
-            _buildTimeRow(
-                AppLocalizations.of(context)!.specify_time, routine.time),
-            const ColumnDivider(),
-            _buildCategoryRow(routine.category),
-            const ColumnDivider(),
-            Text(AppLocalizations.of(context)!.memo,
-                style: const TextStyle(fontSize: 13)),
             Padding(
-              padding: const EdgeInsets.only(top: 12.0, bottom: 24.0),
-              child: Text(
-                routine.memo ?? '',
-                style: const TextStyle(fontSize: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                child: _buildDateRow(
+                    AppLocalizations.of(context)!.when_will_you_start,
+                    routine.startDate?.toLocal())),
+            const ColumnDivider(),
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                child: _buildDateRow(
+                    AppLocalizations.of(context)!.until_when_will_you_try_it,
+                    routine.endDate?.toLocal())),
+            const ColumnDivider(),
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                child: _buildTimeRow(
+                    AppLocalizations.of(context)!.specify_time, routine.time)),
+            const ColumnDivider(),
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                child: _buildCategoryRow(routine.category)),
+            const ColumnDivider(),
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 0.0, bottom: 20.0, right: 10.0, left: 10.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(AppLocalizations.of(context)!.memo,
+                        style: const TextStyle(fontSize: 14)),
+                  ),
+                  ConstrainedBox(
+                    constraints:
+                        const BoxConstraints(maxWidth: 200, minHeight: 60),
+                    child: Text(
+                      routine.memo ?? '',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
               ),
             ),
             Center(
@@ -94,7 +135,11 @@ class RoutineDetailScreen extends HookConsumerWidget {
                         builder: (context) =>
                             AddRotineScreen(routine: routine)),
                   ).then((value) {
-                    if (value) {}
+                    if (value == true) {
+                      if (context.mounted) {
+                        Navigator.of(context).pop(true);
+                      }
+                    }
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -129,7 +174,13 @@ class RoutineDetailScreen extends HookConsumerWidget {
                         return RoutineDeleteDialog(routine: routine);
                       },
                     ),
-                  );
+                  ).then((value) {
+                    if (value == true) {
+                      if (context.mounted) {
+                        Navigator.of(context).pop(true);
+                      }
+                    }
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: const Color(0xff585858),
@@ -157,9 +208,9 @@ class RoutineDetailScreen extends HookConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13)),
+        Text(label, style: const TextStyle(fontSize: 14)),
         Text(date != null ? DateFormat('yyyy / M / d').format(date) : '未指定',
-            style: const TextStyle(fontSize: 13)),
+            style: const TextStyle(fontSize: 14)),
       ],
     );
   }
@@ -168,9 +219,9 @@ class RoutineDetailScreen extends HookConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13)),
+        Text(label, style: const TextStyle(fontSize: 14)),
         Text(time != null ? DateFormat('HH:mm').format(time) : '未指定',
-            style: const TextStyle(fontSize: 13)),
+            style: const TextStyle(fontSize: 14)),
       ],
     );
   }
@@ -179,12 +230,17 @@ class RoutineDetailScreen extends HookConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('カテゴリ', style: TextStyle(fontSize: 13)),
-        Row(
+        const Text('カテゴリ', style: TextStyle(fontSize: 14)),
+        Column(
           children: [
-            const Icon(Icons.circle, color: Colors.teal, size: 24),
+            SizedBox(
+              width: 50,
+              child: Image.asset(
+                category.toCategory().toImagePath(),
+              ),
+            ),
             const SizedBox(width: 8),
-            Text(category, style: const TextStyle(fontSize: 13)),
+            Text(category, style: const TextStyle(fontSize: 14)),
           ],
         ),
       ],
@@ -192,7 +248,9 @@ class RoutineDetailScreen extends HookConsumerWidget {
   }
 
   String _formatWeekDays(List<int> weekDays) {
-    const weekDayNames = ['日', '月', '火', '水', '木', '金', '土'];
+    const weekDayNames = ['月', '火', '水', '木', '金', '土', '日'];
+
+    // 曜日名に変換して、空白で結合
     return weekDays.map((day) => weekDayNames[day - 1]).join(' ');
   }
 }

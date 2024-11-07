@@ -6,8 +6,7 @@ class CustomPicker extends picker.CommonPickerModel {
     return '$value'.padLeft(length, "0");
   }
 
-  CustomPicker({DateTime? currentTime, picker.LocaleType? locale})
-      : super(locale: locale) {
+  CustomPicker({DateTime? currentTime, picker.LocaleType? locale}) {
     this.currentTime = currentTime ?? DateTime.now();
     setLeftIndex(this.currentTime.hour);
     setMiddleIndex(this.currentTime.minute);

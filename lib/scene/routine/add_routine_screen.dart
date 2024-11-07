@@ -23,7 +23,9 @@ class AddRotineScreen extends StatefulWidget {
 class AddRotineScreenState extends State<AddRotineScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  bool _isEdit = false;
+  List<int> _filtersNum = <int>[];
+
+  ObjectId? _routineId; // null != edit
   int _selectType = 0;
   int _selectNeedsTime = 0;
 
@@ -41,49 +43,14 @@ class AddRotineScreenState extends State<AddRotineScreen> {
     super.initState();
 
     if (widget.routine != null) {
-      _isEdit = true;
+      _routineId = widget.routine!.id;
       _routineController.text = widget.routine!.routineName;
       _selectType = widget.routine!.date != null ? 1 : 0;
       _selectNeedsTime = widget.routine!.time != null ? 0 : 1;
 
-      _keyDayOfWeekFilterState.currentState?.filtersNum
-          .addAll(widget.routine!.weekDays);
+      _filtersNum.addAll(widget.routine!.weekDays);
 
-      _keyDayOfWeekFilterState.currentState?.filters.addAll(
-        widget.routine!.weekDays.map((day) => getDayString(day)).toList(),
-      );
-
-      var a = widget.routine!.category;
-      var b = a.toCategory();
-      var c = b.toIndex();
-      _keyCategoriesSelectState.currentState?.setCategoryType(c);
-
-      _keyTimePickerState.currentState?.setTime(widget.routine!.time);
-      _keyDatePickerState.currentState?.setDate(widget.routine!.date);
-      _keyStartDatePickerState.currentState?.setDate(widget.routine!.startDate);
-      _keyEndDatePickerState.currentState?.setDate(widget.routine!.endDate);
       _memoController.text = widget.routine!.memo ?? "";
-    }
-  }
-
-  String getDayString(int day) {
-    switch (day) {
-      case 1:
-        return AppLocalizations.of(context)!.monday;
-      case 2:
-        return AppLocalizations.of(context)!.tuesday;
-      case 3:
-        return AppLocalizations.of(context)!.wednesday;
-      case 4:
-        return AppLocalizations.of(context)!.thursday;
-      case 5:
-        return AppLocalizations.of(context)!.friday;
-      case 6:
-        return AppLocalizations.of(context)!.saturday;
-      case 7:
-        return AppLocalizations.of(context)!.sunday;
-      default:
-        return "";
     }
   }
 
@@ -221,7 +188,9 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                       ),
                     ),
                     const Spacer(),
-                    CustomDatePicker(key: _keyDatePickerState),
+                    CustomDatePicker(
+                        key: _keyDatePickerState,
+                        initialDate: widget.routine?.date),
                   ]),
                   const ColumnDivider(),
                 ]),
@@ -229,7 +198,9 @@ class AddRotineScreenState extends State<AddRotineScreen> {
               Visibility(
                 visible: _selectType == 0,
                 child: Column(children: <Widget>[
-                  DayOfWeekFilter(key: _keyDayOfWeekFilterState),
+                  DayOfWeekFilter(
+                      key: _keyDayOfWeekFilterState,
+                      initialFiltersNum: _filtersNum),
                   const ColumnDivider(),
                   Row(children: <Widget>[
                     SizedBox(
@@ -239,7 +210,9 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                       ),
                     ),
                     const Spacer(),
-                    CustomDatePicker(key: _keyStartDatePickerState),
+                    CustomDatePicker(
+                        key: _keyStartDatePickerState,
+                        initialDate: widget.routine?.startDate),
                   ]),
                   const ColumnDivider(),
                   Row(children: <Widget>[
@@ -251,7 +224,9 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                       ),
                     ),
                     const Spacer(),
-                    CustomDatePicker(key: _keyEndDatePickerState),
+                    CustomDatePicker(
+                        key: _keyEndDatePickerState,
+                        initialDate: widget.routine?.endDate),
                   ]),
                   const ColumnDivider(),
                 ]),
@@ -322,7 +297,9 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                       ),
                     ),
                     const Spacer(),
-                    CustomTimePicker(key: _keyTimePickerState),
+                    CustomTimePicker(
+                        key: _keyTimePickerState,
+                        initialTime: widget.routine?.time),
                   ]),
                   const ColumnDivider(),
                 ]),
@@ -335,7 +312,9 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                     AppLocalizations.of(context)!.category,
                   ),
                 ),
-                CategoriesSelect(key: _keyCategoriesSelectState),
+                CategoriesSelect(
+                    key: _keyCategoriesSelectState,
+                    initialSelectedType: widget.routine?.category.toCategory())
               ]),
               const ColumnDivider(),
               Padding(
@@ -376,11 +355,18 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                               [];
                       var date = _keyDatePickerState.currentState?.date;
 
-                      var maxCount =
-                          countTargetDays(startDate, endDate, weekdays);
+                      weekdays.sort();
+
+                      var maxCount = date == null
+                          ? countTargetDays(startDate, endDate, weekdays)
+                          : 1;
+
+                      if (maxCount == 0) {
+                        return;
+                      }
 
                       var routine = RoutineModel(
-                          ObjectId(),
+                          _routineId ?? ObjectId(),
                           _routineController.text,
                           DateTime.now(),
                           _keyCategoriesSelectState.currentState!.selectedType!
@@ -393,7 +379,7 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                           weekDays: weekdays,
                           memo: _memoController.text);
 
-                      if (_isEdit) {
+                      if (_routineId != null) {
                         RealmService.realmInstance.updateRoutine(routine);
                       } else {
                         RealmService.realmInstance.realm.write(() {
@@ -430,7 +416,7 @@ class AddRotineScreenState extends State<AddRotineScreen> {
 
   int countTargetDays(
       DateTime? startDate, DateTime? endDate, List<int> weekdays) {
-    int count = 1;
+    int count = 0;
 
     if (startDate != null && endDate != null) {
       // 開始日から終了日までの日数分ループ

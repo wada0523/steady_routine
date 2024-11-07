@@ -2,23 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:steady_routine/model/category_type.dart';
 
 class CategoriesSelect extends StatefulWidget {
+  final CategoryType? initialSelectedType;
+
   @override
   State<CategoriesSelect> createState() => CategoriesSelectState();
 
-  const CategoriesSelect({super.key});
+  const CategoriesSelect({super.key, this.initialSelectedType});
 }
 
 class CategoriesSelectState extends State<CategoriesSelect> {
   CategoryType? selectedType;
 
+  @override
+  void initState() {
+    super.initState();
+    selectedType = widget.initialSelectedType;
+  }
+
   void _updateState(int index) {
     setState(() {
       selectedType = index.toCategoryType();
     });
-  }
-
-  void setCategoryType(int index) {
-    _updateState(index);
   }
 
   @override

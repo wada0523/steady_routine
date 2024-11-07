@@ -253,6 +253,7 @@ class AccountScreenState extends State<AccountScreen>
       CategoryType.food,
       CategoryType.other,
     ];
+
     routines.sort((a, b) {
       final indexA = categoryOrder.indexOf(a.category.toCategory());
       final indexB = categoryOrder.indexOf(b.category.toCategory());

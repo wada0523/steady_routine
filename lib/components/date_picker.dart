@@ -3,19 +3,23 @@ import 'package:intl/intl.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 
 class CustomDatePicker extends StatefulWidget {
+  final DateTime? initialDate;
+
+  const CustomDatePicker({super.key, this.initialDate});
+
   @override
   State<CustomDatePicker> createState() => CustomDatePickerState();
-
-  const CustomDatePicker({super.key});
 }
 
 class CustomDatePickerState extends State<CustomDatePicker> {
-  DateTime date = DateTime.now();
+  late DateTime date;
   String _dateString = "";
 
   @override
   void initState() {
     super.initState();
+    date = widget.initialDate?.toLocal() ??
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     _dateString = DateFormat('yyyy / M / d').format(date);
   }
 

@@ -6,7 +6,7 @@ import 'package:steady_routine/service/realm_service.dart';
 class RoutineDeleteDialog extends StatelessWidget {
   final RoutineModel routine;
 
-  const RoutineDeleteDialog({required this.routine});
+  const RoutineDeleteDialog({super.key, required this.routine});
 
   @override
   Widget build(BuildContext context) {

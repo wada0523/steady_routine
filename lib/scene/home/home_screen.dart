@@ -18,13 +18,15 @@ import 'package:steady_routine/service/realm_service.dart';
 class HomeScreen extends HookConsumerWidget {
   HomeScreen({super.key});
 
+  final EasyInfiniteDateTimelineController _controller =
+      EasyInfiniteDateTimelineController();
   final _eventController = StreamController<List<RoutineModel>>.broadcast();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hasRoutine = useState<bool>(false);
     final selectedIndex = useState<int>(0);
-    final selectedDate = useState<DateTime>(DateTime.now());
+    final selectedDate = useState<DateTime>(DateTime.now().toLocal());
     final checkStates = useState<Map<String, Map<ObjectId, bool>>>({});
 
     useEffect(() {
@@ -40,12 +42,30 @@ class HomeScreen extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(),
       body: Column(children: [
-        EasyDateTimeLine(
-          initialDate: selectedDate.value,
+        EasyInfiniteDateTimeLine(
+          controller: _controller,
+          firstDate: DateTime(selectedDate.value.year, 1, 1),
+          focusDate: selectedDate.value,
+          lastDate: DateTime(selectedDate.value.year + 1, 12, 31),
           onDateChange: (date) {
             selectedDate.value = date;
           },
           activeColor: const Color(0xffFFBF9B),
+          headerBuilder: (BuildContext context, DateTime date) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              child: Center(
+                child: Text(
+                  '${date.year}年 ${date.month}月', // 日付情報を表示
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+          },
           dayProps: const EasyDayProps(
             height: 56.0,
             width: 56.0,
@@ -124,7 +144,7 @@ class HomeScreen extends HookConsumerWidget {
                                     );
                                   },
                                 ),
-                                Text(routine.routineName),
+                                _buildRoutineText(routine),
                                 const Spacer(flex: 1),
                                 SizedBox(
                                   width: 50,
@@ -137,7 +157,7 @@ class HomeScreen extends HookConsumerWidget {
                                                 RoutineDetailScreen(
                                                     routine: routine)),
                                       ).then((value) {
-                                        if (value) {
+                                        if (value == true) {
                                           _fetchRoutine(
                                               selectedDate.value, checkStates);
                                         }
@@ -215,7 +235,7 @@ class HomeScreen extends HookConsumerWidget {
                 MaterialPageRoute(
                     builder: (context) => const AddRotineScreen()),
               ).then((value) {
-                if (value) {
+                if (value == true) {
                   if (!hasRoutine.value) {
                     _checkHasRoutine(hasRoutine);
                   }
@@ -234,6 +254,13 @@ class HomeScreen extends HookConsumerWidget {
         },
       ),
     );
+  }
+
+  Widget _buildRoutineText(RoutineModel routine) {
+    return routine.time != null
+        ? Text(
+            '${routine.routineName} (${DateFormat('HH:mm').format(routine.time!)}〜)')
+        : Text(routine.routineName);
   }
 
   Widget _noDataWidget(BuildContext context, ValueNotifier<bool> hasRoutine) {
