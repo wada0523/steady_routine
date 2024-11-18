@@ -2,21 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steady_routine/navigation_service.dart';
+import 'package:steady_routine/scene/home/home_screen.dart';
 import 'package:steady_routine/scene/onboarding/onboarding_screen.dart';
 import 'package:steady_routine/service/realm_service.dart';
 import 'package:steady_routine/providers/locale_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+
+  if (isFirstLaunch) {
+    // 初回起動の場合は、フラグをfalseに更新
+    await prefs.setBool('isFirstLaunch', false);
+  }
+
   runApp(
-    const ProviderScope(
-      child: MyApp(),
+    ProviderScope(
+      child: MyApp(isFirstLaunch: isFirstLaunch),
     ),
   );
 }
 
 class MyApp extends HookConsumerWidget {
-  const MyApp({super.key});
+  final bool isFirstLaunch;
+
+  const MyApp({super.key, required this.isFirstLaunch});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -54,7 +67,7 @@ class MyApp extends HookConsumerWidget {
         }
         return supportedLocales.first;
       },
-      home: const OnboardingScreen(),
+      home: isFirstLaunch ? const OnboardingScreen() : HomeScreen(),
     );
   }
 }

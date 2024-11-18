@@ -11,26 +11,85 @@ class RoutineDeleteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.delete_routine),
+      backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
-      content: Text(AppLocalizations.of(context)!.delete_routine_confirm),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16), // 角丸を設定
+      ),
+      title: Column(
+        children: [
+          Image.asset(
+            'assets/images/announce.png',
+            width: 48,
+            height: 48,
+            fit: BoxFit.cover,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            AppLocalizations.of(context)!.delete_routine,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      content: Text(
+        AppLocalizations.of(context)!.delete_routine_confirm,
+        style: const TextStyle(fontSize: 16),
+        textAlign: TextAlign.center,
+      ),
+      actionsAlignment: MainAxisAlignment.center,
       actions: [
-        TextButton(
-          onPressed: () {
-            // キャンセル時の処理
-            Navigator.of(context).pop(false);
-          },
-          child: Text(AppLocalizations.of(context)!.cancel),
-        ),
-        TextButton(
-          onPressed: () async {
-            // 削除時の処理
-            await _deleteRoutine(routine);
-            if (context.mounted) {
-              Navigator.of(context).pop(true);
-            }
-          },
-          child: Text(AppLocalizations.of(context)!.delete),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // キャンセルボタン
+            SizedBox(
+              width: 100,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xff5D5D5D)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.cancel,
+                  style: const TextStyle(color: Colors.black, fontSize: 14),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 10),
+            // 削除ボタン
+            SizedBox(
+              width: 100,
+              child: ElevatedButton(
+                onPressed: () async {
+                  await _deleteRoutine(routine);
+                  if (context.mounted) {
+                    Navigator.of(context).pop(true);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xffF88273), // 背景色を赤系に設定
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.delete,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

@@ -26,6 +26,7 @@
   "specify_time": "Specify the time",
   "yes": "Yes",
   "no": "No",
+  "unspecified": "Unspecified",
   "time": "Time",
   "category": "Category",
   "memo": "memo",
@@ -36,5 +37,6 @@
   "friday": "Fri",
   "saturday": "Sat",
   "sunday": "Sun",
+  "today": "Today",
   "no_data_img_path": "assets/images/no_data_en.png"
 }

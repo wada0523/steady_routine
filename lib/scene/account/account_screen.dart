@@ -167,13 +167,13 @@ class AccountScreenState extends State<AccountScreen>
             // Conditionally display the icon or a placeholder SizedBox
             isFirst
                 ? SizedBox(
-                    width: 50,
+                    width: 30,
                     child: Image.asset(
                       icon,
                     ),
                   )
-                : const SizedBox(width: 50),
-            const SizedBox(width: 10),
+                : const SizedBox(width: 30),
+            const SizedBox(width: 15),
             isFirst
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +181,7 @@ class AccountScreenState extends State<AccountScreen>
                       Text(
                         title,
                         style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         "登録日： $date",
@@ -189,8 +189,8 @@ class AccountScreenState extends State<AccountScreen>
                       ),
                     ],
                   )
-                : const SizedBox(width: 50),
-            const Spacer(flex: 1),
+                : const SizedBox(width: 60),
+            const SizedBox(width: 30),
             Column(
               children: [
                 ...activities,
@@ -209,21 +209,21 @@ class AccountScreenState extends State<AccountScreen>
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         SizedBox(
-            width: 80,
+            width: 90,
             child: Align(
               alignment: Alignment.centerRight,
               child: Text(
                 name,
                 textAlign: TextAlign.right,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
             )),
         SizedBox(
-            width: 80,
+            width: 60,
             child: Align(
               alignment: Alignment.centerRight,
               child: Text(
@@ -231,7 +231,7 @@ class AccountScreenState extends State<AccountScreen>
                 textAlign: TextAlign.right,
                 style: TextStyle(
                   color: isCompleted ? Colors.pink : Colors.black,
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),

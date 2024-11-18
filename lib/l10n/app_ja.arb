@@ -26,6 +26,7 @@
   "specify_time": "時間指定",
   "yes": "あり",
   "no": "なし",
+  "unspecified": "未指定",
   "time": "時間",
   "category": "カテゴリ",
   "memo": "メモ",
@@ -36,5 +37,6 @@
   "friday": "金",
   "saturday": "土",
   "sunday": "日",
+  "today": "今日",
   "no_data_img_path": "assets/images/no_data_ja.png"
 }

@@ -23,7 +23,7 @@ class AddRotineScreen extends StatefulWidget {
 class AddRotineScreenState extends State<AddRotineScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  List<int> _filtersNum = <int>[];
+  final List<int> _filtersNum = <int>[];
 
   ObjectId? _routineId; // null != edit
   int _selectType = 0;
@@ -105,6 +105,11 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: TextFormField(
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) {
+                    FocusScope.of(context).unfocus();
+                  },
                   controller: _routineController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -329,6 +334,11 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                 child: SizedBox(
                   height: 100,
                   child: TextFormField(
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).unfocus();
+                    },
                     controller: _memoController,
                     cursorColor: const Color.fromRGBO(131, 124, 124, 1),
                     decoration: const InputDecoration(
@@ -368,7 +378,7 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                       var routine = RoutineModel(
                           _routineId ?? ObjectId(),
                           _routineController.text,
-                          DateTime.now(),
+                          DateTime.now().toLocal(),
                           _keyCategoriesSelectState.currentState!.selectedType!
                               .toShortString(),
                           maxCount,

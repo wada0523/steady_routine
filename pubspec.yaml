@@ -52,7 +52,7 @@ dependencies:
 
 dev_dependencies:
 
-  # dart run build_runner build --delete-conflicting-outputs
+  # fvm dart run build_runner build --delete-conflicting-outputs
   build_runner: ^2.4.12
 
   riverpod_generator: ^2.1.4
@@ -105,7 +105,7 @@ flutter_icons:
   android: true
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/images/app_icon_android.png"
+  image_path: "assets/images/app_icon.png"
   min_sdk_android: 21
   adaptive_icon_background: '#DBEFF1'
   adaptive_icon_foreground: 'assets/images/app_icon_android.png'

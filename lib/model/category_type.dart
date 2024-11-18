@@ -3,9 +3,9 @@ enum CategoryType {
   beauty,
   child,
   study,
+  medicine,
   book,
   food,
-  medicine,
   other,
 }
 

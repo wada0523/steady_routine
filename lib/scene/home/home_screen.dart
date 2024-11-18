@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:realm/realm.dart';
+import 'package:realm/realm.dart' as realm;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steady_routine/scene/account/account_screen.dart';
 import 'package:steady_routine/model/category_type.dart';
@@ -27,20 +27,20 @@ class HomeScreen extends HookConsumerWidget {
     final hasRoutine = useState<bool>(false);
     final selectedIndex = useState<int>(0);
     final selectedDate = useState<DateTime>(DateTime.now().toLocal());
-    final checkStates = useState<Map<String, Map<ObjectId, bool>>>({});
+    final checkStates = useState<Map<String, Map<realm.ObjectId, bool>>>({});
 
     useEffect(() {
       _checkHasRoutine(hasRoutine);
-      return null;
-    }, []);
-
-    useEffect(() {
       _fetchRoutine(selectedDate.value, checkStates);
       return null;
-    }, [selectedDate.value]);
+    }, [selectedDate.value, hasRoutine.value, checkStates.value]);
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      backgroundColor: Colors.white,
       body: Column(children: [
         EasyInfiniteDateTimeLine(
           controller: _controller,
@@ -53,16 +53,47 @@ class HomeScreen extends HookConsumerWidget {
           activeColor: const Color(0xffFFBF9B),
           headerBuilder: (BuildContext context, DateTime date) {
             return Container(
+              color: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              child: Center(
-                child: Text(
-                  '${date.year}年 ${date.month}月', // 日付情報を表示
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: 60,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        _controller.animateToCurrentData();
+                        selectedDate.value = DateTime.now().toLocal();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffF88273),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!.today,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ),
                   ),
-                ),
+                  Center(
+                    child: Text(
+                      '${date.year}年 ${date.month}月', // 日付情報を表示
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 60,
+                  )
+                ],
               ),
             );
           },
@@ -187,6 +218,11 @@ class HomeScreen extends HookConsumerWidget {
                     );
                   },
                 );
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                // データが読み込まれるまでローディング表示
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else {
@@ -196,70 +232,87 @@ class HomeScreen extends HookConsumerWidget {
           ),
         )
       ]),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/images/footer_settings.png',
-                fit: BoxFit.cover),
-            label: "",
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Divider(
+            indent: 10,
+            endIndent: 10,
+            height: 1,
+            color: Color(0xffC6C6C6),
+            thickness: 1,
           ),
-          BottomNavigationBarItem(
-            icon:
-                Image.asset('assets/images/footer_add.png', fit: BoxFit.cover),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/images/footer_account.png',
-                fit: BoxFit.cover),
-            label: "",
-          ),
+          BottomNavigationBar(
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            backgroundColor: Colors.white,
+            items: [
+              BottomNavigationBarItem(
+                icon: Image.asset('assets/images/footer_settings.png',
+                    fit: BoxFit.cover),
+                label: "",
+              ),
+              BottomNavigationBarItem(
+                icon: Image.asset('assets/images/footer_add.png',
+                    fit: BoxFit.cover),
+                label: "",
+              ),
+              BottomNavigationBarItem(
+                icon: Image.asset('assets/images/footer_account.png',
+                    fit: BoxFit.cover),
+                label: "",
+              ),
+            ],
+            currentIndex: selectedIndex.value,
+            selectedItemColor: Colors.grey,
+            unselectedItemColor: Colors.grey,
+            onTap: (index) {
+              selectedIndex.value = index;
+              switch (selectedIndex.value) {
+                case 0:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen()),
+                  ).then((value) {
+                    debugPrint(value);
+                  });
+                  break;
+                case 1:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AddRotineScreen()),
+                  ).then((value) {
+                    if (value == true) {
+                      _fetchRoutine(selectedDate.value, checkStates);
+                      if (!hasRoutine.value) {
+                        _checkHasRoutine(hasRoutine);
+                      }
+                    }
+                  });
+                  break;
+                case 2:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AccountScreen()),
+                  ).then((value) {
+                    debugPrint(value);
+                  });
+                  break;
+              }
+            },
+          )
         ],
-        currentIndex: selectedIndex.value,
-        selectedItemColor: Colors.grey,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          selectedIndex.value = index;
-          switch (selectedIndex.value) {
-            case 0:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              ).then((value) {
-                debugPrint(value);
-              });
-              break;
-            case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const AddRotineScreen()),
-              ).then((value) {
-                if (value == true) {
-                  if (!hasRoutine.value) {
-                    _checkHasRoutine(hasRoutine);
-                  }
-                }
-              });
-              break;
-            case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AccountScreen()),
-              ).then((value) {
-                debugPrint(value);
-              });
-              break;
-          }
-        },
       ),
     );
   }
 
   Widget _buildRoutineText(RoutineModel routine) {
-    return routine.time != null
-        ? Text(
-            '${routine.routineName} (${DateFormat('HH:mm').format(routine.time!)}〜)')
+    DateTime? time = routine.time?.toLocal();
+    return time != null
+        ? Text('${routine.routineName} (${DateFormat('HH:mm').format(time)}〜)')
         : Text(routine.routineName);
   }
 
@@ -297,24 +350,30 @@ class HomeScreen extends HookConsumerWidget {
   }
 
   Future<void> _fetchRoutine(DateTime date,
-      ValueNotifier<Map<String, Map<ObjectId, bool>>> checkStates) async {
-    List<RoutineModel> todayRoutine =
-        await RealmService.realmInstance.getRoutines(date);
+      ValueNotifier<Map<String, Map<realm.ObjectId, bool>>> checkStates) async {
+    try {
+      List<RoutineModel> todayRoutine =
+          await RealmService.realmInstance.getRoutines(date);
 
-    Map<ObjectId, bool> newStates = checkStates.value[date.toString()] ?? {};
+      Map<realm.ObjectId, bool> newStates =
+          checkStates.value[date.toString()] ?? {};
 
-    for (RoutineModel routine in todayRoutine) {
-      bool isComplete = routine.completeDays.contains(
-        DateFormat('yyyyMMdd').format(date),
-      );
-      newStates[routine.id] = isComplete;
+      for (RoutineModel routine in todayRoutine) {
+        bool isComplete = routine.completeDays.contains(
+          DateFormat('yyyyMMdd').format(date),
+        );
+        newStates[routine.id] = isComplete;
+      }
+
+      checkStates.value = {
+        ...checkStates.value,
+        date.toString(): newStates,
+      };
+
+      _eventController.add(todayRoutine);
+    } catch (error) {
+      debugPrint("Error in _fetchRoutine: $error");
+      _eventController.addError(error);
     }
-
-    checkStates.value = {
-      ...checkStates.value,
-      date.toString(): newStates,
-    };
-
-    _eventController.add(todayRoutine);
   }
 }

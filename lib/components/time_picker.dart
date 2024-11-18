@@ -50,7 +50,8 @@ class CustomTimePickerState extends State<CustomTimePicker> {
             }, onConfirm: (date) {
               _updateTime(date);
             },
-                pickerModel: CustomPicker(currentTime: DateTime.now()),
+                pickerModel:
+                    CustomPicker(currentTime: DateTime.now().toLocal()),
                 locale: picker.LocaleType.en);
           },
           child: Text(

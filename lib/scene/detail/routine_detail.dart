@@ -34,7 +34,7 @@ class RoutineDetailScreen extends HookConsumerWidget {
           color: const Color(0xffffffff),
         ),
         title: Text(
-          AppLocalizations.of(context)!.settings_title,
+          AppLocalizations.of(context)!.routine_datail,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22.0,
@@ -42,7 +42,7 @@ class RoutineDetailScreen extends HookConsumerWidget {
           ),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,39 +64,54 @@ class RoutineDetailScreen extends HookConsumerWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(AppLocalizations.of(context)!.repeat,
-                      style: const TextStyle(fontSize: 14)),
-                  Text(_formatWeekDays(routine.weekDays),
-                      style: const TextStyle(fontSize: 14)),
-                ],
+            if (routine.date != null) ...[
+              Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                  child: _buildDateRow(
+                      context,
+                      AppLocalizations.of(context)!.date,
+                      routine.date?.toLocal())),
+              const ColumnDivider(),
+            ] else ...[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(AppLocalizations.of(context)!.repeat,
+                        style: const TextStyle(fontSize: 14)),
+                    Text(_formatWeekDays(routine.weekDays),
+                        style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
               ),
-            ),
-            const ColumnDivider(),
-            Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-                child: _buildDateRow(
-                    AppLocalizations.of(context)!.when_will_you_start,
-                    routine.startDate?.toLocal())),
-            const ColumnDivider(),
-            Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-                child: _buildDateRow(
-                    AppLocalizations.of(context)!.until_when_will_you_try_it,
-                    routine.endDate?.toLocal())),
-            const ColumnDivider(),
+              const ColumnDivider(),
+              Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                  child: _buildDateRow(
+                      context,
+                      AppLocalizations.of(context)!.when_will_you_start,
+                      routine.startDate?.toLocal())),
+              const ColumnDivider(),
+              Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+                  child: _buildDateRow(
+                      context,
+                      AppLocalizations.of(context)!.until_when_will_you_try_it,
+                      routine.endDate?.toLocal())),
+              const ColumnDivider(),
+            ],
             Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
                 child: _buildTimeRow(
-                    AppLocalizations.of(context)!.specify_time, routine.time)),
+                    context,
+                    AppLocalizations.of(context)!.specify_time,
+                    routine.time?.toLocal())),
             const ColumnDivider(),
             Padding(
                 padding:
@@ -171,7 +186,12 @@ class RoutineDetailScreen extends HookConsumerWidget {
                       pageBuilder: (BuildContext context,
                           Animation<double> animation,
                           Animation<double> secondaryAnimation) {
-                        return RoutineDeleteDialog(routine: routine);
+                        return Scaffold(
+                          backgroundColor: Colors.black.withOpacity(0.5),
+                          body: Center(
+                            child: RoutineDeleteDialog(routine: routine),
+                          ),
+                        );
                       },
                     ),
                   ).then((value) {
@@ -204,23 +224,29 @@ class RoutineDetailScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildDateRow(String label, DateTime? date) {
+  Widget _buildDateRow(BuildContext context, String label, DateTime? date) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: const TextStyle(fontSize: 14)),
-        Text(date != null ? DateFormat('yyyy / M / d').format(date) : '未指定',
+        Text(
+            date != null
+                ? DateFormat('yyyy / M / d').format(date)
+                : AppLocalizations.of(context)!.unspecified,
             style: const TextStyle(fontSize: 14)),
       ],
     );
   }
 
-  Widget _buildTimeRow(String label, DateTime? time) {
+  Widget _buildTimeRow(BuildContext context, String label, DateTime? time) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: const TextStyle(fontSize: 14)),
-        Text(time != null ? DateFormat('HH:mm').format(time) : '未指定',
+        Text(
+            time != null
+                ? DateFormat('HH:mm').format(time)
+                : AppLocalizations.of(context)!.unspecified,
             style: const TextStyle(fontSize: 14)),
       ],
     );

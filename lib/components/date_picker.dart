@@ -18,8 +18,9 @@ class CustomDatePickerState extends State<CustomDatePicker> {
   @override
   void initState() {
     super.initState();
-    date = widget.initialDate?.toLocal() ??
-        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    DateTime now = DateTime.now().toLocal();
+    date =
+        widget.initialDate?.toLocal() ?? DateTime(now.year, now.month, now.day);
     _dateString = DateFormat('yyyy / M / d').format(date);
   }
 
@@ -48,7 +49,7 @@ class CustomDatePickerState extends State<CustomDatePicker> {
               _updateDate(date);
             }, onConfirm: (date) {
               _updateDate(date);
-            }, currentTime: DateTime.now(), locale: LocaleType.jp);
+            }, currentTime: DateTime.now().toLocal(), locale: LocaleType.jp);
           },
           child: Text(
             _dateString,

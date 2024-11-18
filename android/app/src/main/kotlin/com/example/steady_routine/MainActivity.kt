@@ -1,4 +1,4 @@
-package com.example.steady_routine
+package com.yohaku.cotsu
 
 import io.flutter.embedding.android.FlutterActivity
 

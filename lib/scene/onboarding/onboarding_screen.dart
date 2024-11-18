@@ -55,9 +55,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     SizeConfig().init(context);
     double width = SizeConfig.screenW!;
-    double height = SizeConfig.screenH!;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
@@ -71,20 +74,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 itemCount: contents.length,
                 itemBuilder: (context, i) {
                   return Padding(
-                    padding: const EdgeInsets.all(40.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
                         Text(
                           contents[i].title,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: "Mulish",
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                             fontSize: (width <= 550) ? 30 : 35,
                           ),
                         ),
-                        SizedBox(
-                          height: (height >= 840) ? 60 : 30,
+                        const SizedBox(
+                          height: 20,
                         ),
                         Image.asset(
                           contents[i].image,

@@ -41,7 +41,7 @@ class DayOfWeekFilterState extends State<DayOfWeekFilter> {
 
     for (final (index, weekday) in weekdays.indexed) {
       yield FilterChip(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         label: Text(weekday,
             style: TextStyle(
                 color:
