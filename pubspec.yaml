@@ -49,6 +49,7 @@ dependencies:
   hooks_riverpod: 2.5.2
 
   flutter_datetime_picker_plus: ^2.2.0
+  # google_mobile_ads: ^5.2.0
 
 dev_dependencies:
 

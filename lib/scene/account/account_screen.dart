@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import "package:intl/intl.dart";
 import 'package:steady_routine/model/routine.dart';
@@ -6,41 +8,19 @@ import 'package:steady_routine/model/category_type.dart';
 import 'package:steady_routine/service/realm_service.dart';
 import 'dart:async';
 
-class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+class AccountScreen extends HookConsumerWidget {
+  AccountScreen({super.key});
 
-  @override
-  AccountScreenState createState() => AccountScreenState();
-}
-
-class AccountScreenState extends State<AccountScreen>
-    with WidgetsBindingObserver {
   final _routineController =
       StreamController<List<(String, RoutineModel)>>.broadcast();
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _fetchRoutine();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _routineController.close();
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
       _fetchRoutine();
-    }
-  }
+      return null;
+    }, []);
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -65,91 +45,87 @@ class AccountScreenState extends State<AccountScreen>
         ),
       ),
       body: Scaffold(
-          backgroundColor: Colors.white,
-          body: Expanded(
-            child: StreamBuilder<List<(String, RoutineModel)>>(
-              stream: _routineController.stream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  // Group routines by category
-                  final Map<String, List<RoutineModel>> groupedRoutines = {};
+        backgroundColor: Colors.white,
+        body: StreamBuilder<List<(String, RoutineModel)>>(
+          stream: _routineController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              // Group routines by category
+              final Map<String, List<RoutineModel>> groupedRoutines = {};
 
-                  for (var item in snapshot.data!) {
-                    final category = item.$1; // First element is the category
-                    final routine =
-                        item.$2; // Second element is the RoutineModel
+              for (var item in snapshot.data!) {
+                final category = item.$1; // First element is the category
+                final routine = item.$2; // Second element is the RoutineModel
 
-                    if (!groupedRoutines.containsKey(category)) {
-                      groupedRoutines[category] = [];
-                    }
-                    groupedRoutines[category]!.add(routine);
-                  }
+                if (!groupedRoutines.containsKey(category)) {
+                  groupedRoutines[category] = [];
+                }
+                groupedRoutines[category]!.add(routine);
+              }
 
-                  return ListView.builder(
-                    itemCount: groupedRoutines.keys.length,
-                    itemBuilder: (context, categoryIndex) {
-                      final category =
-                          groupedRoutines.keys.elementAt(categoryIndex);
-                      final routinesInCategory = groupedRoutines[category]!;
+              return ListView.builder(
+                itemCount: groupedRoutines.keys.length,
+                itemBuilder: (context, categoryIndex) {
+                  final category =
+                      groupedRoutines.keys.elementAt(categoryIndex);
+                  final routinesInCategory = groupedRoutines[category]!;
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Routines in this category
-                          ListView.builder(
-                            physics:
-                                const NeverScrollableScrollPhysics(), // Prevent scrolling of inner list
-                            shrinkWrap:
-                                true, // Use shrinkWrap to limit the height of the inner list
-                            itemCount: routinesInCategory.length,
-                            itemBuilder: (context, index) {
-                              final event = routinesInCategory[index];
-                              var formatter = DateFormat('yyyy/MM/dd');
-                              var formatted = formatter.format(event.created);
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 16, right: 16),
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      _buildHistoryItem(
-                                        context,
-                                        isFirst: index == 0,
-                                        icon: event.category
-                                            .toCategory()
-                                            .toImagePath(),
-                                        title: event.category,
-                                        date: formatted,
-                                        activities: [
-                                          _buildActivity(
-                                            event.routineName,
-                                            event.completeDays.length,
-                                            event.maxCount,
-                                          ),
-                                        ],
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Routines in this category
+                      ListView.builder(
+                        physics:
+                            const NeverScrollableScrollPhysics(), // Prevent scrolling of inner list
+                        shrinkWrap:
+                            true, // Use shrinkWrap to limit the height of the inner list
+                        itemCount: routinesInCategory.length,
+                        itemBuilder: (context, index) {
+                          final event = routinesInCategory[index];
+                          var formatter = DateFormat('yyyy/MM/dd');
+                          var formatted = formatter.format(event.created);
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 16, right: 16),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildHistoryItem(
+                                    context,
+                                    isFirst: index == 0,
+                                    icon: event.category
+                                        .toCategory()
+                                        .toImagePath(),
+                                    title: event.category,
+                                    date: formatted,
+                                    activities: [
+                                      _buildActivity(
+                                        event.routineName,
+                                        event.completeDays.length,
+                                        event.maxCount,
                                       ),
                                     ],
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                          const Divider(), // Optional divider between categories
-                        ],
-                      );
-                    },
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(), // Optional divider between categories
+                    ],
                   );
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return const SizedBox(); // Show an empty state if no data
-                }
-              },
-            ),
-          )),
+                },
+              );
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return const SizedBox(); // Show an empty state if no data
+            }
+          },
+        ),
+      ),
     );
   }
 
@@ -175,21 +151,24 @@ class AccountScreenState extends State<AccountScreen>
                 : const SizedBox(width: 30),
             const SizedBox(width: 15),
             isFirst
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "登録日： $date",
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
+                ? SizedBox(
+                    width: 120,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "登録日： $date",
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
                   )
-                : const SizedBox(width: 60),
+                : const SizedBox(width: 120),
             const SizedBox(width: 30),
             Column(
               children: [
@@ -206,7 +185,8 @@ class AccountScreenState extends State<AccountScreen>
   Widget _buildActivity(String name, int progress, int total,
       {bool isCompleted = false}) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         SizedBox(
             width: 90,
@@ -214,7 +194,6 @@ class AccountScreenState extends State<AccountScreen>
               alignment: Alignment.centerRight,
               child: Text(
                 name,
-                textAlign: TextAlign.right,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -223,7 +202,7 @@ class AccountScreenState extends State<AccountScreen>
               ),
             )),
         SizedBox(
-            width: 60,
+            width: 80,
             child: Align(
               alignment: Alignment.centerRight,
               child: Text(

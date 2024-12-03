@@ -2,8 +2,6 @@
   "@@locale":"en",
   "next": "Next",
   "start": "Start",
-  "onboarding1": "Register the routine\nyou want to continue\nconsistently with ease.",
-  "onboarding2": "You can quickly see\nhow many times\nyou've worked hard!\nPraise yourself!",
   "settings_title": "Settings",
   "language_settings": "Language settings",
   "account_title": "History",
@@ -38,5 +36,8 @@
   "saturday": "Sat",
   "sunday": "Sun",
   "today": "Today",
+  "onboarding1": "assets/images/onboarding1en.png",
+  "onboarding2": "assets/images/onboarding2en.png",
+  "onboarding3": "assets/images/onboarding3en.png",
   "no_data_img_path": "assets/images/no_data_en.png"
 }

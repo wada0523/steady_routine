@@ -2,8 +2,6 @@
   "@@locale":"ja",
   "next": "次へ",
   "start": "はじめる",
-  "onboarding1":"コツコツ続けたい\nルーチンを\nかんたん登録",
-  "onboarding2": "がんばった回数が\nすぐわかる！\n自分をほめよう！",
   "settings_title": "設定",
   "language_settings": "言語設定",
   "account_title": "ヒストリー",
@@ -38,5 +36,8 @@
   "saturday": "土",
   "sunday": "日",
   "today": "今日",
+  "onboarding1": "assets/images/onboarding1ja.png",
+  "onboarding2": "assets/images/onboarding2ja.png",
+  "onboarding3": "assets/images/onboarding3ja.png",
   "no_data_img_path": "assets/images/no_data_ja.png"
 }

@@ -44,12 +44,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     List<OnboardingContents> contents = [
       OnboardingContents(
-        title: AppLocalizations.of(context)!.onboarding1,
-        image: "assets/images/onboarding1.png",
+        // title: AppLocalizations.of(context)!.onboarding1,
+        image: AppLocalizations.of(context)!.onboarding1,
       ),
       OnboardingContents(
-        title: AppLocalizations.of(context)!.onboarding2,
-        image: "assets/images/onboarding2.png",
+        // title: AppLocalizations.of(context)!.onboarding2,
+        image: AppLocalizations.of(context)!.onboarding2,
+      ),
+      OnboardingContents(
+        // title: AppLocalizations.of(context)!.onboarding2,
+        image: AppLocalizations.of(context)!.onboarding2,
       ),
     ];
 
@@ -57,49 +61,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     double width = SizeConfig.screenW!;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xffDBEFF1),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
-              flex: 3,
+              flex: 8,
               child: PageView.builder(
                 physics: const BouncingScrollPhysics(),
                 controller: _controller,
                 onPageChanged: (value) => setState(() => _currentPage = value),
                 itemCount: contents.length,
                 itemBuilder: (context, i) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          contents[i].title,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: (width <= 550) ? 30 : 35,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Image.asset(
+                  return Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: Image.asset(
                           contents[i].image,
-                          height: SizeConfig.blockV! * 35,
+                          fit: BoxFit.fitWidth,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 },
               ),
             ),
             Expanded(
-              flex: 1,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -114,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   _currentPage + 1 == contents.length
                       ? Padding(
-                          padding: const EdgeInsets.all(30),
+                          padding: const EdgeInsets.only(bottom: 20),
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.pushReplacement(
@@ -141,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         )
                       : Padding(
-                          padding: const EdgeInsets.all(30),
+                          padding: const EdgeInsets.only(bottom: 20),
                           child: ElevatedButton(
                             onPressed: () {
                               _controller.nextPage(

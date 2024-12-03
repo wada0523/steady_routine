@@ -8,6 +8,7 @@ import 'package:steady_routine/scene/home/home_screen.dart';
 import 'package:steady_routine/scene/onboarding/onboarding_screen.dart';
 import 'package:steady_routine/service/realm_service.dart';
 import 'package:steady_routine/providers/locale_provider.dart';
+import 'package:steady_routine/util/admob.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
