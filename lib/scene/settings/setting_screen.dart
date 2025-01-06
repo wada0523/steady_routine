@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:steady_routine/providers/locale_provider.dart';
+import 'package:steady_routine/util/admob.dart';
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final bannerId = getAdBannerUnitId();
+    BannerAd myBanner = BannerAd(
+        adUnitId: bannerId,
+        size: AdSize.banner,
+        request: const AdRequest(),
+        listener: const BannerAdListener());
+    myBanner.load();
+
     final locale = ref.watch(localeNotifierProvider);
 
     return Scaffold(
@@ -87,6 +97,17 @@ class SettingsScreen extends HookConsumerWidget {
               ],
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Container(
+            width: myBanner.size.width.toDouble(),
+            height: myBanner.size.height.toDouble(),
+            alignment: Alignment.center,
+            child: AdWidget(ad: myBanner),
+          ),
         ),
       ),
     );

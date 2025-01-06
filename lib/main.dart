@@ -1,3 +1,5 @@
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,6 +21,8 @@ void main() async {
     // 初回起動の場合は、フラグをfalseに更新
     await prefs.setBool('isFirstLaunch', false);
   }
+
+  MobileAds.instance.initialize();
 
   runApp(
     ProviderScope(
@@ -46,6 +50,8 @@ class MyApp extends HookConsumerWidget {
       [],
     );
 
+    showAppTrackingTransparency();
+
     return MaterialApp(
       navigatorKey: NavigationService.navigatorKey,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -70,5 +76,13 @@ class MyApp extends HookConsumerWidget {
       },
       home: isFirstLaunch ? const OnboardingScreen() : HomeScreen(),
     );
+  }
+
+  void showAppTrackingTransparency() async {
+    final TrackingStatus status =
+        await AppTrackingTransparency.trackingAuthorizationStatus;
+    if (status == TrackingStatus.notDetermined) {
+      await AppTrackingTransparency.requestTrackingAuthorization();
+    }
   }
 }

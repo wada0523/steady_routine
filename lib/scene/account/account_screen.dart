@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import "package:intl/intl.dart";
 import 'package:steady_routine/model/routine.dart';
 import 'package:steady_routine/model/category_type.dart';
 import 'package:steady_routine/service/realm_service.dart';
-import 'dart:async';
+import 'package:steady_routine/util/admob.dart';
 
 class AccountScreen extends HookConsumerWidget {
   AccountScreen({super.key});
@@ -16,6 +18,14 @@ class AccountScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final bannerId = getAdBannerUnitId();
+    BannerAd myBanner = BannerAd(
+        adUnitId: bannerId,
+        size: AdSize.banner,
+        request: const AdRequest(),
+        listener: const BannerAdListener());
+    myBanner.load();
+
     useEffect(() {
       _fetchRoutine();
       return null;
@@ -113,7 +123,7 @@ class AccountScreen extends HookConsumerWidget {
                           );
                         },
                       ),
-                      const Divider(), // Optional divider between categories
+                      const Divider(),
                     ],
                   );
                 },
@@ -124,6 +134,17 @@ class AccountScreen extends HookConsumerWidget {
               return const SizedBox(); // Show an empty state if no data
             }
           },
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Container(
+            width: myBanner.size.width.toDouble(),
+            height: myBanner.size.height.toDouble(),
+            alignment: Alignment.center,
+            child: AdWidget(ad: myBanner),
+          ),
         ),
       ),
     );
