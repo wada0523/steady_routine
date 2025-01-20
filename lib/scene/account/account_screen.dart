@@ -96,30 +96,32 @@ class AccountScreen extends HookConsumerWidget {
                           var formatted = formatter.format(event.created);
                           return Padding(
                             padding: const EdgeInsets.only(left: 16, right: 16),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  _buildHistoryItem(
-                                    context,
-                                    isFirst: index == 0,
-                                    icon: event.category
-                                        .toCategory()
-                                        .toImagePath(),
-                                    title: event.category,
-                                    date: formatted,
-                                    activities: [
-                                      _buildActivity(
-                                        event.routineName,
-                                        event.completeDays.length,
-                                        event.maxCount,
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildHistoryItem(
+                                        context,
+                                        isFirst: index == 0,
+                                        icon: event.category
+                                            .toCategory()
+                                            .toImagePath(),
+                                        title: event.category,
+                                        date: formatted,
+                                        activities: [
+                                          _buildActivity(
+                                            event.routineName,
+                                            event.completeDays.length,
+                                            event.maxCount,
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ),
+                                ]),
                           );
                         },
                       ),
@@ -173,7 +175,7 @@ class AccountScreen extends HookConsumerWidget {
             const SizedBox(width: 15),
             isFirst
                 ? SizedBox(
-                    width: 120,
+                    width: 110,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -189,8 +191,8 @@ class AccountScreen extends HookConsumerWidget {
                       ],
                     ),
                   )
-                : const SizedBox(width: 120),
-            const SizedBox(width: 30),
+                : const SizedBox(width: 110),
+            const SizedBox(width: 20),
             Column(
               children: [
                 ...activities,
@@ -206,8 +208,8 @@ class AccountScreen extends HookConsumerWidget {
   Widget _buildActivity(String name, int progress, int total,
       {bool isCompleted = false}) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween, // 左右で均等配置
+      crossAxisAlignment: CrossAxisAlignment.center, // 垂直方向で中央揃え
       children: [
         SizedBox(
             width: 90,
