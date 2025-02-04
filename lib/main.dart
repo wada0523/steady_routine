@@ -1,4 +1,3 @@
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,7 +9,6 @@ import 'package:steady_routine/scene/home/home_screen.dart';
 import 'package:steady_routine/scene/onboarding/onboarding_screen.dart';
 import 'package:steady_routine/service/realm_service.dart';
 import 'package:steady_routine/providers/locale_provider.dart';
-import 'package:steady_routine/util/admob.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,12 +20,61 @@ void main() async {
     await prefs.setBool('isFirstLaunch', false);
   }
 
+  await gdpr();
   MobileAds.instance.initialize();
 
   runApp(
     ProviderScope(
       child: MyApp(isFirstLaunch: isFirstLaunch),
     ),
+  );
+}
+
+void loadForm() {
+  ConsentForm.loadConsentForm(
+    (ConsentForm consentForm) async {
+      var status = await ConsentInformation.instance.getConsentStatus();
+      if (status == ConsentStatus.required) {
+        consentForm.show(
+          (FormError? formError) {
+            // Handle dismissal by reloading form
+            loadForm();
+          },
+        );
+      }
+    },
+    (FormError formError) {
+      // Handle the error
+    },
+  );
+}
+
+Future<void> gdpr() async {
+  //TODO: for debug
+  // ConsentInformation.instance.reset();
+  // ConsentDebugSettings debugSettings = ConsentDebugSettings(
+  //   debugGeography: DebugGeography.debugGeographyEea,
+  //   testIdentifiers: <String>[
+  //     '00000000-0000-0000-0000-000000000000', // シミュレーター用識別子
+  //   ],
+  // );
+  // final ConsentRequestParameters params = ConsentRequestParameters(
+  //   consentDebugSettings: debugSettings,
+  // );
+  //for debug end
+
+  final ConsentRequestParameters params = ConsentRequestParameters();
+
+  ConsentInformation.instance.requestConsentInfoUpdate(
+    params,
+    () async {
+      if (await ConsentInformation.instance.isConsentFormAvailable()) {
+        loadForm();
+      }
+    },
+    (FormError error) {
+      // Handle the error
+    },
   );
 }
 
@@ -49,8 +96,6 @@ class MyApp extends HookConsumerWidget {
       },
       [],
     );
-
-    showAppTrackingTransparency();
 
     return MaterialApp(
       navigatorKey: NavigationService.navigatorKey,
@@ -76,13 +121,5 @@ class MyApp extends HookConsumerWidget {
       },
       home: isFirstLaunch ? const OnboardingScreen() : HomeScreen(),
     );
-  }
-
-  void showAppTrackingTransparency() async {
-    final TrackingStatus status =
-        await AppTrackingTransparency.trackingAuthorizationStatus;
-    if (status == TrackingStatus.notDetermined) {
-      await AppTrackingTransparency.requestTrackingAuthorization();
-    }
   }
 }

@@ -38,14 +38,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
-  app_tracking_transparency:
-    dependency: "direct main"
-    description:
-      name: app_tracking_transparency
-      sha256: "64d9745931e565790abdea91b518ac8dc3cebe6d0d0aaf7119343271b983259a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.6"
   archive:
     dependency: transitive
     description:
@@ -414,10 +406,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_mobile_ads
-      sha256: "4775006383a27a5d86d46f8fb452bfcb17794fc0a46c732979e49a8eb1c8963f"
+      sha256: "0d4a3744b5e8ed1b8be6a1b452d309f811688855a497c6113fc4400f922db603"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.0"
+    version: "5.3.1"
   graphs:
     dependency: transitive
     description:
@@ -1003,18 +995,18 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter
-      sha256: ec81f57aa1611f8ebecf1d2259da4ef052281cb5ad624131c93546c79ccc7736
+      sha256: "889a0a678e7c793c308c68739996227c9661590605e70b1f6cf6b9a6634f7aec"
       url: "https://pub.dev"
     source: hosted
-    version: "4.9.0"
+    version: "4.10.0"
   webview_flutter_android:
     dependency: transitive
     description:
       name: webview_flutter_android
-      sha256: "47a8da40d02befda5b151a26dba71f47df471cddd91dfdb7802d0a87c5442558"
+      sha256: "5568f17a9c25c0fdd0737900fa1c2d1fee2d780bc212d9aec10c2d1f48ef0f59"
       url: "https://pub.dev"
     source: hosted
-    version: "3.16.9"
+    version: "4.3.1"
   webview_flutter_platform_interface:
     dependency: transitive
     description:
@@ -1027,10 +1019,10 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter_wkwebview
-      sha256: b7e92f129482460951d96ef9a46b49db34bd2e1621685de26e9eaafd9674e7eb
+      sha256: "8e0593559bfecd35eb1757d6907ed6b995a41ef82607d6113df897c2805ce6be"
       url: "https://pub.dev"
     source: hosted
-    version: "3.16.3"
+    version: "3.18.0"
   xdg_directories:
     dependency: transitive
     description:

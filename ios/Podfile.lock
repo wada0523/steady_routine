@@ -1,16 +1,14 @@
 PODS:
-  - app_tracking_transparency (0.0.1):
-    - Flutter
   - Flutter (1.0.0)
   - flutter_native_splash (0.0.1):
     - Flutter
-  - Google-Mobile-Ads-SDK (11.10.0):
+  - Google-Mobile-Ads-SDK (11.13.0):
     - GoogleUserMessagingPlatform (>= 1.1)
-  - google_mobile_ads (5.2.0):
+  - google_mobile_ads (5.3.1):
     - Flutter
-    - Google-Mobile-Ads-SDK (~> 11.10.0)
+    - Google-Mobile-Ads-SDK (~> 11.13.0)
     - webview_flutter_wkwebview
-  - GoogleUserMessagingPlatform (2.6.0)
+  - GoogleUserMessagingPlatform (2.7.0)
   - realm (3.4.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
@@ -21,7 +19,6 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
-  - app_tracking_transparency (from `.symlinks/plugins/app_tracking_transparency/ios`)
   - Flutter (from `Flutter`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - google_mobile_ads (from `.symlinks/plugins/google_mobile_ads/ios`)
@@ -35,8 +32,6 @@ SPEC REPOS:
     - GoogleUserMessagingPlatform
 
 EXTERNAL SOURCES:
-  app_tracking_transparency:
-    :path: ".symlinks/plugins/app_tracking_transparency/ios"
   Flutter:
     :path: Flutter
   flutter_native_splash:
@@ -51,15 +46,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
-  app_tracking_transparency: e169b653478da7bb15a6c61209015378ca73e375
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_native_splash: edf599c81f74d093a4daf8e17bd7a018854bc778
-  Google-Mobile-Ads-SDK: 13e6e98edfd78ad8d8a791edb927658cc260a56f
-  google_mobile_ads: 2a538d8e42b1813809782792e48f8cf4374c2180
-  GoogleUserMessagingPlatform: 0c3a08353e53ce8c2feab7addd0b652cde522450
+  Google-Mobile-Ads-SDK: 14f57f2dc33532a24db288897e26494640810407
+  google_mobile_ads: fe0e2c1764ad95323dd0e3081d0bb2d58411f957
+  GoogleUserMessagingPlatform: a8b56893477f67212fbc8411c139e61d463349f5
   realm: 94a1e545507aa8a09d6f069393e9468ea7edc72c
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
-  webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
+  webview_flutter_wkwebview: a4af96a051138e28e29f60101d094683b9f82188
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 

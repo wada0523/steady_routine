@@ -62,9 +62,9 @@ class HomeScreen extends HookConsumerWidget {
         children: [
           EasyInfiniteDateTimeLine(
             controller: _controller,
-            firstDate: DateTime(selectedDate.value.year, 1, 1),
+            firstDate: DateTime(now.year - 1, 1, 1),
             focusDate: selectedDate.value,
-            lastDate: DateTime(selectedDate.value.year + 1, 12, 31),
+            lastDate: DateTime(now.year + 1, 12, 31),
             onDateChange: (date) {
               selectedDate.value = date;
             },

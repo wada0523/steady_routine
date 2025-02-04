@@ -12,5 +12,5 @@ import webview_flutter_wkwebview
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   RealmPlugin.register(with: registry.registrar(forPlugin: "RealmPlugin"))
   SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))
-  FLTWebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "FLTWebViewFlutterPlugin"))
+  WebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "WebViewFlutterPlugin"))
 }

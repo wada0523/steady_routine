@@ -372,6 +372,11 @@ class AddRotineScreenState extends State<AddRotineScreen> {
                           : 1;
 
                       if (maxCount == 0) {
+                        const snackBar = SnackBar(
+                          content: Text("対象日がありません"),
+                          duration: Duration(seconds: 2),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         return;
                       }
 
@@ -445,6 +450,11 @@ class AddRotineScreenState extends State<AddRotineScreen> {
 
   bool validation() {
     if (_routineController.text == "") {
+      const snackBar = SnackBar(
+        content: Text("Please enter the rotine name"),
+        duration: Duration(seconds: 2),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return false;
     }
     if (_selectType == 0) {
@@ -452,22 +462,42 @@ class AddRotineScreenState extends State<AddRotineScreen> {
       List<int>? filters = _keyDayOfWeekFilterState.currentState?.filtersNum;
       if (filters == null || filters.isEmpty) {
         //　曜日指定なし
+        const snackBar = SnackBar(
+          content: Text("Please enter the day of the week"),
+          duration: Duration(seconds: 2),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         return false;
       }
       DateTime? startDate = _keyStartDatePickerState.currentState?.date;
       if (startDate == null) {
         // 開始日なし
+        const snackBar = SnackBar(
+          content: Text("Please enter the date"),
+          duration: Duration(seconds: 2),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         return false;
       }
       DateTime? endDate = _keyEndDatePickerState.currentState?.date;
       if (endDate == null) {
         // 終了日なし
+        const snackBar = SnackBar(
+          content: Text("Please enter the date"),
+          duration: Duration(seconds: 2),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         return false;
       }
     } else {
       DateTime? date = _keyDatePickerState.currentState?.date;
       if (date == null) {
         // 日にちなし
+        const snackBar = SnackBar(
+          content: Text("Please enter the date"),
+          duration: Duration(seconds: 1),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         return false;
       }
     }
@@ -476,6 +506,11 @@ class AddRotineScreenState extends State<AddRotineScreen> {
       DateTime? time = _keyTimePickerState.currentState?.time;
       if (time == null) {
         // 時間なし
+        const snackBar = SnackBar(
+          content: Text("Please enter the time"),
+          duration: Duration(seconds: 2),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         return false;
       }
     }
@@ -484,6 +519,11 @@ class AddRotineScreenState extends State<AddRotineScreen> {
         _keyCategoriesSelectState.currentState?.selectedType;
     if (category == null) {
       //　カテゴリ指定なし
+      const snackBar = SnackBar(
+        content: Text("Please enter the category"),
+        duration: Duration(seconds: 2),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return false;
     }
 
